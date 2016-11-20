@@ -23,7 +23,7 @@ S3_BUCKET_PUBLIC_URL = 'https://' + S3_REGION_DOMAIN + '/' + S3_BUCKET_NAME + '/
 DYNAMODB_TABLE_NAME = 'YOUR_ATTRIBUTE'
 
 logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 
 def reply_line_messages(reply_token, messages):
@@ -174,6 +174,13 @@ def reply_line_bot(webhook_event_object):
 
     rec_msg = webhook_event_object['message']['text']
     reply_token = webhook_event_object['replyToken']
+    if 'userId' in webhook_event_object['source']:
+        user_id = webhook_event_object['source']['userId']
+    elif 'roomId' in webhook_event_object['source']:
+        user_id = webhook_event_object['source']['roomId']
+    elif 'groupId' in webhook_event_object['source']:
+        user_id = webhook_event_object['source']['groupId']
+    logger.debug(user_id)
     if rec_msg.startswith('drink'):
         data = convert_drink_log_data_from_msg(rec_msg)
         if data == []:
@@ -187,7 +194,7 @@ def reply_line_bot(webhook_event_object):
         else:
             put_item_drink_log_line_table(
                 webhook_event_object['message']['id'],
-                webhook_event_object['source']['userId'],
+                user_id,
                 webhook_event_object['timestamp'],
                 data[1],
                 data[2]
@@ -199,7 +206,8 @@ def reply_line_bot(webhook_event_object):
                   }
             ]
     elif rec_msg.startswith('report'):
-        msg = create_report_data(webhook_event_object['source']['userId'])
+        msg = create_report_data(user_id)
+
     else:
         msg = [
               {
