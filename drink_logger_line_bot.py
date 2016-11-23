@@ -4,6 +4,7 @@ import logging
 import json
 import requests
 import boto3
+from PIL import Image
 from boto3.dynamodb.conditions import Attr
 from multiprocessing import Process
 from collections import Counter, OrderedDict
@@ -21,10 +22,10 @@ S3_BUCKET_NAME = 'YOUR_ATTRIBUTE'
 S3_REGION_DOMAIN = 'YOUR_ATTRIBUTE'
 S3_BUCKET_PUBLIC_URL = 'https://' + S3_REGION_DOMAIN + '/' + S3_BUCKET_NAME + '/'
 DYNAMODB_TABLE_NAME = 'YOUR_ATTRIBUTE'
+IMAGE_HEAIGHT = 350
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
 
 def reply_line_messages(reply_token, messages):
     payload = {
@@ -54,11 +55,40 @@ def put_image_from_google_search_to_s3(drink_name):
 
     image_url = res.json()['items'][0]['link']
     res = requests.get(image_url)
+
+    saved_img_path = '/tmp/b_' + drink_name
+    resized_img_filename = drink_name + '.jpg'
+    resized_img_path = '/tmp/' + resized_img_filename
+
     if res.status_code == 200:
-        with open('/tmp/' + drink_name, 'wb') as file:
+        with open(saved_img_path, 'wb') as file:
             file.write(res.content)
-        s3.Object(S3_BUCKET_NAME, drink_name +
-                  '.jpg').put(Body=open('/tmp/' + drink_name, 'rb'))
+        resize_img(saved_img_path, resized_img_path, IMAGE_HEAIGHT)
+        s3.Object(S3_BUCKET_NAME, resized_img_filename).put(Body=open(resized_img_path, 'rb'))
+
+
+def resize_img(before, after, height, aa_enable=True):
+    """
+    resize image file
+    :param str before: source image file path
+    :param str after: resized image file path
+    :param int height: resize height
+    :param bool aa_enable: antialias setting
+    :return:
+    """
+    img = Image.open(before)
+    img.show()
+
+    before_x, before_y = img.size[0], img.size[1]
+    x = int(round(float(height / float(before_y) * float(before_x))))
+    y = height
+    resize_img = img
+    if aa_enable:
+        resize_img.thumbnail((x, y), Image.ANTIALIAS)
+    else:
+        resize_img = resize_img.resize((x, y))
+    resize_img.save(after, 'jpeg', quality=100)
+    logger.debug("RESIZED!:{}[{}x{}] --> {}x{}".format(after, before_x, before_y, x, y))
 
 
 def put_item_drink_log_line_table(post_id, user_id, send_date, drink_name, drink_volume):
