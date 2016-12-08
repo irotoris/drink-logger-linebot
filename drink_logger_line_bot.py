@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import os
 import re
 import logging
 import json
@@ -10,18 +11,18 @@ from multiprocessing import Process
 from collections import Counter, OrderedDict
 
 LINE_REPLY_ENDPOINT = 'https://api.line.me/v2/bot/message/reply'
-LINE_CHANNEL_ACCESS_TOKEN = 'YOUR_ATTRIBUTE'
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
 LINE_REQUEST_HEADER = {
     "Content-Type": "application/json",
     "Authorization": "Bearer " + LINE_CHANNEL_ACCESS_TOKEN
 }
-GOOGLE_API_KEY = 'YOUR_ATTRIBUTE'
-GOOGLE_CUSTOM_SEARCH_ID = 'YOUR_ATTRIBUTE'
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_CUSTOM_SEARCH_ID = os.getenv('GOOGLE_CUSTOM_SEARCH_ID')
 GOOGLE_CUSTOM_SEARCH_ENDPOINT = 'https://www.googleapis.com/customsearch/v1'
-S3_BUCKET_NAME = 'YOUR_ATTRIBUTE'
-S3_REGION_DOMAIN = 'YOUR_ATTRIBUTE'
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+S3_REGION_DOMAIN = os.getenv('S3_REGION_DOMAIN')
 S3_BUCKET_PUBLIC_URL = 'https://' + S3_REGION_DOMAIN + '/' + S3_BUCKET_NAME + '/'
-DYNAMODB_TABLE_NAME = 'YOUR_ATTRIBUTE'
+DYNAMODB_TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 IMAGE_HEAIGHT = 350
 
 logger = logging.getLogger()
