@@ -1,38 +1,51 @@
 # Drink Logger Bot for LINE
-This program is LINE BOT to log your drink on AWS Lambda with AWS API Gateway, DynamoDB, S3, Google Custom Search API and LINE Messaging API.
+LINE BOT to log your drink on AWS Lambda with AWS API Gateway, DynamoDB, S3, Google Custom Search API and LINE Messaging API.
+Using AWS SAM.
 
 ## Requirements
 * Python 2.7
-* Your AWS Account
+* AWS Account
   * API Gateway
   * Lambda
   * DynamoDB
   * S3
-* Your LINE BOT Account
+* LINE BOT Account
 * Google API
   * Custom Search API
 
 ## Attribute
-You need to change attributes in `drink_logger_line_bot.py`.
-* `LINE_CHANNEL_ACCESS_TOKEN`
-* `GOOGLE_API_KEY`
-* `GOOGLE_CUSTOM_SEARCH_ID`
-* `S3_REGION_DOMAIN`
-* `S3_BUCKET_NAME`
+Change attributes in `template.yaml`.
+* `__AWS_ACCOUNT__`
+* `__LINE_CHANNEL_ACCESS_TOKEN__`
+* `__GOOGLE_API_KEY__`
+* `__GOOGLE_CUSTOM_SEARCH_ID__`
+* `__S3_REGION_DOMAIN__`
+* `__S3_BUCKET_NAME__`
+
+## Build
+1. Set awscli config
+1. Set environment variable for `build_image.sh` and run the script.  
+```
+git clone https://github.com/irotoris/drink_logger_line_bot.git
+cd drink_logger_line_bot
+export SAM_DST_S3_BUCKET=<YOUR_S3_BUCKET_FOR_AWS_SAM>`
+sh build_image.sh
+```
+
+You get packaged-template.yaml by AWS CloudFormation.
 
 ## Deploy
 1. Create your LINE BOT Account and Access token
 1. Create S3 bucket and Publish
-1. Create DyanmoDB table
-  * primary key `id`
-1. Deploy codes to Lambda and Configure API Gateway
-  * `git clone https://github.com/irotoris/drink_logger_line_bot.git`
-  * `cd drink_logger_line_bot && pip install -r requirements.txt -t ./`
-  * Configure attributes in `drink_logger_line_bot.py`
-  * `zip -r upload.zip ./*`
-  * Upload `upload.zip` to AWS Lambda
-  * Configure Lambda Trigger (->API Gateway)
-1. Configure LINE BOT Webhook URL (->API Gateway URL)
+1. Deploy AWS SAM
+```
+aws cloudformation deploy \
+    --template-file packaged-template.yaml 
+    --capabilities CAPABILITY_IAM 
+    --stack-name <YOUR_STACK_NAME>
+```
+
+You get Bot Endpoint on API Gateway AWS Console,and set LINE BOT ENDPOINT on LINE Developers Console.
 
 ## License
 MIT License
