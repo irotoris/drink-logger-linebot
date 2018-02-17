@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Drink Logger LINE Bot Lambda function by using AWS SAM.
+Resources:
+  DLLBotLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python2.7
+      Role: arn:aws:iam::__AWS_ACCOUNT__:role/lambda_dynamo
+      Environment:
+        Variables:
+          LINE_CHANNEL_ACCESS_TOKEN: '__LINE_CHANNEL_ACCESS_TOKEN__'
+          GOOGLE_API_KEY: '__GOOGLE_API_KEY__'
+          GOOGLE_CUSTOM_SEARCH_ID: '__GOOGLE_CUSTOM_SEARCH_ID__'
+          S3_BUCKET_NAME: '__S3_BUCKET_NAME__'
+          S3_REGION_DOMAIN: '__S3_REGION_DOMAIN__'
+          DYNAMODB_TABLE_NAME: !Ref DLLBotDynamoTable
+      CodeUri: 'functions/dllbot/package/lambda_function.zip'
+      Events:
+        DLLBotApi:
+          Type: Api
+          Properties:
+            Path: /dllbot
+            Method: post
+      Timeout: 30
+  DLLBotDynamoTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
