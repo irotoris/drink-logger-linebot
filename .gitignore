@@ -118,3 +118,8 @@ ENV/
 # specific this package
 functions/dllbot/package/*
 packaged-template.yaml
+sandbox.txt
+
+# terraform
+.terraform
+terraform.tfstate*
