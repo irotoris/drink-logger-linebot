@@ -20,8 +20,8 @@ GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GOOGLE_CUSTOM_SEARCH_ID = os.getenv('GOOGLE_CUSTOM_SEARCH_ID')
 GOOGLE_CUSTOM_SEARCH_ENDPOINT = 'https://www.googleapis.com/customsearch/v1'
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-S3_REGION_DOMAIN = os.getenv('S3_REGION_DOMAIN')
-S3_BUCKET_PUBLIC_URL = 'https://' + S3_REGION_DOMAIN + '/' + S3_BUCKET_NAME + '/'
+CLOUD_FRONT_DOMAIN = os.getenv('CLOUD_FRONT_DOMAIN')
+IMG_URL = 'https://' + CLOUD_FRONT_DOMAIN + '/'
 DYNAMODB_TABLE_NAME = os.getenv('DYNAMODB_TABLE_NAME')
 IMAGE_HEAIGHT = 350
 
@@ -98,7 +98,7 @@ def put_item_drink_log_line_table(post_id, user_id, timestamp, drink_name, drink
     dynamodb = boto3.resource('dynamodb')
     drink_log_line_table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
-    res = requests.get(S3_BUCKET_PUBLIC_URL + drink_name + '.jpg')
+    res = requests.get(IMG_URL + drink_name + '.jpg')
     if res.status_code != 200:
         put_image_from_google_search_to_s3(drink_name)
 
@@ -161,7 +161,7 @@ def create_report_data(user_id):
         logger.debug(drink_name)
         ranking_top.append(
             {
-                "imageUrl": S3_BUCKET_PUBLIC_URL + drink_name + ".jpg",
+                "imageUrl": IMG_URL + drink_name + ".jpg",
                 "action": {
                         "type": "postback",
                         "label": str(c[drink_name]) + "ml",

@@ -14,7 +14,7 @@ Resources:
           GOOGLE_API_KEY: '__GOOGLE_API_KEY__'
           GOOGLE_CUSTOM_SEARCH_ID: '__GOOGLE_CUSTOM_SEARCH_ID__'
           S3_BUCKET_NAME: '__S3_BUCKET_NAME__'
-          S3_REGION_DOMAIN: '__S3_REGION_DOMAIN__'
+          CLOUD_FRONT_DOMAIN: '__CLOUD_FRONT_DOMAIN__'
           DYNAMODB_TABLE_NAME: !Ref DLLBotDynamoTable
       CodeUri: 'functions/dllbot/package/lambda_function.zip'
       Events:
@@ -31,5 +31,5 @@ Resources:
         Name: id
         Type: String
       ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
